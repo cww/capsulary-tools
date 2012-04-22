@@ -55,32 +55,62 @@ sub scan
 {
     my ($current_system_id, $desired_sec) = @_;
 
-    my %seen = ( $current_system_id => 1 );
+    my @candidates = ( [ $current_system_id ] );
+    my @results;
 
-    my @queue = ($current_system_id);
-
-    # Breadth-first search.
-    while (scalar(@queue) > 0)
+    my $depth = 1;
+    my $finished = 0;
+    my %systems_seen = ( $current_system_id => 1 );
+    while (!$finished)
     {
-        my $system_id = shift(@queue);
-        my $system_name = get_system_name($system_id);
-        my $sec = get_sec($system_id);
-        my $name_sec = "${system_name}[$sec]";
-        say "Processing: $name_sec";
-
-        if ($sec eq $desired_sec)
+        for (my $i = 0; $i < scalar(@candidates); ++$i)
         {
-            return $name_sec;
+            my $candidate_ref = $candidates[$i];
+            if (scalar(@$candidate_ref) == $depth)
+            {
+                splice(@candidates, $i--, 1);
+                my $system_id = $candidate_ref->[$depth - 1];
+                my $sec = get_sec($system_id);
+
+                #my $system_name = get_system_name($system_id);
+                #say " % Examining $system_name\[" . ($sec / 10) . ']';
+
+                if ($depth > 1 && $sec == $desired_sec)
+                {
+                    push(@results, $candidate_ref);
+                    $finished = 1;
+                }
+                else
+                {
+                    my @new_candidates;
+                    push(@new_candidates, map
+                    {
+                        [ @$candidate_ref, $_ ]
+                    } @{get_gates($system_id)});
+
+                    # Don't duplicate systems.
+                    for (my $j = 0; $j < scalar(@new_candidates); ++$j)
+                    {
+                        my $new_system_id = $new_candidates[$j]->[$depth];
+                        if ($systems_seen{$new_system_id})
+                        {
+                            splice(@new_candidates, $j--, 1);
+                        }
+                        else
+                        {
+                            $systems_seen{$new_system_id} = 1;
+                        }
+                    }
+
+                    push(@candidates, @new_candidates);
+                }
+            }
         }
 
-        my $gates_ref = get_gates($system_id);
-        for (my $i = 0; $i < scalar(@$gates_ref); ++$i)
-        {
-            my $gate_system_id = $gates_ref->[$i];
-            push(@queue, $gate_system_id) unless $seen{$gate_system_id};
-            $seen{$gate_system_id} = 1;
-        }
+        ++$depth;
     }
+
+    return \@results;
 }
 
 if (!$ARGV[0] || !$ARGV[1])
@@ -99,4 +129,22 @@ if (!$current_system_id)
     fatal("Unknown system: $current_system");
 }
 
-say scan($current_system_id, $desired_sec);
+my $results_ref = scan($current_system_id, $desired_sec);
+
+for my $result_ref (@$results_ref)
+{
+    say join(q{ -> }, map
+    {
+        my $system_name = get_system_name($_);
+        my $sec = get_sec($_);
+        if ($sec < 10)
+        {
+            $sec =~ s/(.)$/0\.$1/;
+        }
+        else
+        {
+            $sec =~ s/(.)$/\.$1/;
+        }
+        "${system_name}[$sec]"
+    } @$result_ref);
+}
