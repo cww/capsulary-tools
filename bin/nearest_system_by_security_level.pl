@@ -119,7 +119,7 @@ if (!$ARGV[0] || !$ARGV[1])
 }
 
 my $current_system = $ARGV[0];
-my $desired_sec = $ARGV[1] * 10;
+my $desired_sec = $ARGV[1];
 
 my $redis = Redis->new(encoding => undef);
 
@@ -128,6 +128,13 @@ if (!$current_system_id)
 {
     fatal("Unknown system: $current_system");
 }
+
+if ($desired_sec <= -1.0 || $desired_sec > 1.0)
+{
+    fatal("Desired security status out of range (-1.0,1.0]: $desired_sec");
+}
+
+$desired_sec *= 10;
 
 my $results_ref = scan($current_system_id, $desired_sec);
 
