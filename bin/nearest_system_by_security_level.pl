@@ -113,10 +113,7 @@ sub scan
     return \@results;
 }
 
-if (!$ARGV[0] || !$ARGV[1])
-{
-    usage($0);
-}
+usage($0) unless defined($ARGV[0]) && defined($ARGV[1]);
 
 my $current_system = $ARGV[0];
 my $desired_sec = $ARGV[1];
@@ -134,12 +131,14 @@ if ($desired_sec <= -1.0 || $desired_sec > 1.0)
     fatal("Desired security status out of range (-1.0,1.0]: $desired_sec");
 }
 
-$desired_sec *= 10;
+# Playing with integers is easier than playing with floats.
+$desired_sec = int($desired_sec * 10);
 
 my $results_ref = scan($current_system_id, $desired_sec);
 
 for my $result_ref (@$results_ref)
 {
+    # Format the output: System1[sec] -> System2[sec] -> System3[sec] -> ...
     say join(q{ -> }, map
     {
         my $system_name = get_system_name($_);
