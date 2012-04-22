@@ -1,0 +1,14 @@
+NAME                    AMT(m3) RNG(km) TIME(s) CPU(tf) PWR(MW) DEEPCORE
+Civilian Miner          30      10      60      70      2       no
+Cu Vapor Particle Bore  49      12.4    60      57      2       no
+Deep Core Mining Laser  40      5       60      150     2       yes
+Dual Diode Mining Laser 44      11.2    60      54      2       no
+EP-R Argon Ion Basic Ex 21      10.6    60      59      2       no
+EP-S Gaussian Excavatio 42      10.6    60      51      2       no
+Miner I                 40      10      60      60      2       no
+Miner II                60      12      60      80      4       no
+Modulated Deep Core Min 120     10      180     80      3       yes
+Rubin Basic Particle Bo 24      12.4    60      66      2       no
+Single Diode Basic Mini 22      11.2    60      63      2       no
+XeCl Drilling Beam I    47      11.8    60      48      2       no
+Xenon Basic Drilling Be 23      11.8    60      56      2       no
