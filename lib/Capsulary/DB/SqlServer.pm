@@ -1,5 +1,7 @@
 package Capsulary::DB::SqlServer;
 
+use common::sense;
+
 use Carp;
 use DBI;
 
@@ -29,16 +31,19 @@ sub connect
         "dbi:ODBC:dsn=$self->{dsn}",
         $self->{username},
         $self->{password},
+        { RaiseError => 1 },
     ) or croak $!;
 }
 
 sub get_handle
 {
+    my ($self) = @_;
     return $self->{dbh};
 }
 
 sub disconnect
 {
+    my ($self) = @_;
     $self->{dbh}->disconnect() if $self->{dbh};
 }
 

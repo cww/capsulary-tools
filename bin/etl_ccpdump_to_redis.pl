@@ -17,8 +17,8 @@ BEGIN
 use constant BASE => 'eve';
 use constant ETL =>
 [
-    'type' =>
     {
+        '__reference_name' => 'type',
         '__table' => 'dbo.invTypes',
         '__primary_key' => 'typeID',
         '__backref' =>
@@ -40,7 +40,7 @@ use constant ETL =>
         'basePrice' => 'base_price',
         'published' => 'published',
         'marketGroupID' => 'market_group_id',
-        'changeOfDuplicating' => 'chance_of_duplicating',
+        'chanceOfDuplicating' => 'chance_of_duplicating',
         'iconID' => 'icon_id',
     },
 ];
@@ -116,6 +116,38 @@ my $redis = Capsulary::DB::Redis->new
     port => $opt_redis_port,
 });
 my $rh = $redis->get_handle();
+
+for my $table_ref (@{+ETL})
+{
+    my $table_name = $table_ref->{__table};
+    INFO "Processing table [$table_name]";
+    my $primary_key_name = $table_ref->{__primary_key};
+    my $reference_name = $table_ref->{__reference_name};
+
+    my @columns = grep { !/^__/ } keys %$table_ref;
+    my $column_clause = join(q{, }, @columns);
+    my $sql = qq{SELECT * FROM $table_name};
+    my $sth = $dbh->prepare($sql);
+
+    DEBUG "Running SQL: $sql";
+    $sth->execute();
+    my $i_row = 0;
+    while (my $row_ref = $sth->fetchrow_hashref())
+    {
+        #say %$row_ref;
+        ++$i_row;
+    }
+
+    INFO "Processed [$i_row] records.";
+
+    if (defined($sth->err()))
+    {
+        WARN('ODBC: ' . $sth->errstr()) if $sth->err() eq 0;
+        INFO('ODBC: ' . $sth->errstr()) if $sth->err() eq q{};
+    }
+
+    $sth->finish();
+}
 
 $sqlserver->disconnect();
 $redis->disconnect();

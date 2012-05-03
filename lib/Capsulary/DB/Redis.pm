@@ -1,5 +1,7 @@
 package Capsulary::DB::Redis;
 
+use common::sense;
+
 use Carp;
 use Redis;
 
@@ -27,11 +29,13 @@ sub connect
 
 sub get_handle
 {
+    my ($self) = @_;
     return $self->{dbh};
 }
 
 sub disconnect
 {
+    my ($self) = @_;
     $self->{dbh}->disconnect() if $self->{dbh};
 }
 
