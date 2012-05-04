@@ -206,7 +206,8 @@ my $redis = Capsulary::DB::Redis->new
 my $rh;
 if (!$opt_dry_run)
 {
-    my $rh = $redis->get_handle();
+    $redis->connect();
+    $rh = $redis->get_handle();
 }
 
 for my $table_ref (@{+ETL})

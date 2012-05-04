@@ -36,7 +36,7 @@ sub get_handle
 sub disconnect
 {
     my ($self) = @_;
-    $self->{dbh}->disconnect() if $self->{dbh};
+    $self->{dbh}->quit() if $self->{dbh};
 }
 
 1;
