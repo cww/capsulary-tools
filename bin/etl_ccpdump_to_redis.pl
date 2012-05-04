@@ -59,6 +59,7 @@ my $opt_redis_port = 6379;
 my $opt_debug_output;
 my @opt_tables;
 my %_opt_tables;
+my $opt_dry_run;
 
 sub usage
 {
@@ -77,6 +78,7 @@ sub usage
     say "    --redis-port PORT  The Redis port [6379]";
     say "    --tables T1,T2,... A list of tables to export (do not include";
     say "                       \"dbo\" schema prefix) [all tables]";
+    say "    --dry-run          Do not connect to anything";
 
     exit -1;
 }
@@ -93,6 +95,7 @@ sub parse_opts
         'redis-host=s' => \$opt_redis_host,
         'redis-port=s' => \$opt_redis_port,
         'tables=s'     => \@opt_tables,
+        'dry-run'      => \$opt_dry_run,
     );
 
     usage() if $opt_help;
@@ -136,15 +139,23 @@ my $sqlserver = Capsulary::DB::SqlServer->new
     username => $opt_username,
     password => $opt_password,
 });
-$sqlserver->connect();
-my $dbh = $sqlserver->get_handle();
+my $dbh;
+if (!$opt_dry_run)
+{
+    $sqlserver->connect();
+    $dbh = $sqlserver->get_handle();
+}
 
 my $redis = Capsulary::DB::Redis->new
 ({
     host => $opt_redis_host,
     port => $opt_redis_port,
 });
-my $rh = $redis->get_handle();
+my $rh;
+if (!$opt_dry_run)
+{
+    my $rh = $redis->get_handle();
+}
 
 for my $table_ref (@{+ETL})
 {
@@ -160,9 +171,14 @@ for my $table_ref (@{+ETL})
     my @columns = grep { !/^__/ } keys %$table_ref;
     my $column_clause = join(q{, }, @columns);
     my $sql = qq{SELECT * FROM $table_name};
+    DEBUG "Generated SQL: $sql";
+    if ($opt_dry_run)
+    {
+        DEBUG 'Dry run: not executing SQL.';
+        next;
+    }
     my $sth = $dbh->prepare($sql);
 
-    DEBUG "Running SQL: $sql";
     $sth->execute();
     my $i_row = 0;
     while (my $row_ref = $sth->fetchrow_hashref())
