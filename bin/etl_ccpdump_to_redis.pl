@@ -187,8 +187,6 @@ for my $table_ref (@{+ETL})
     my $primary_key_name = $table_ref->{__primary_key};
     my $reference_name = $table_ref->{__reference_name};
 
-    my @columns = grep { !/^__/ } keys %$table_ref;
-    my $column_clause = join(q{, }, @columns);
     my $sql = $opt_small ?
               qq{SELECT TOP 1 * FROM $table_name} :
               qq{SELECT * FROM $table_name};
