@@ -12,6 +12,10 @@ use Capsulary::DB::SqlServer;
 BEGIN
 {
     Log::Log4perl->easy_init($INFO);
+
+    # The SQL Server ODBC driver sometimes craps out with "Unexpected EOF from
+    # the server" if this isn't specified.
+    $ENV{TDSVER} = '7.0';
 }
 
 use constant BASE => 'eve';
