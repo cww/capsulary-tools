@@ -63,6 +63,39 @@ use constant ETL =>
         'iconID' => 'icon_id',
         'shortDescription' => 'short_description',
     },
+    {
+        '__reference_name' => 'bloodline',
+        '__table' => 'chrBloodlines',
+        '__primary_key' => 'bloodlineID',
+        '__backref' =>
+        [
+            {
+                by       => 'name',
+                referrer => 'bloodlineName',
+            },
+            {
+                by       => 'race_id',
+                referrer => 'raceID',
+            },
+        ],
+        'bloodlineID' => 'id',
+        'bloodlineName' => 'name',
+        'raceID' => 'race_id',
+        'description' => 'description',
+        'maleDescription' => 'male_description',
+        'femaleDescription' => 'female_description',
+        'shipTypeID' => 'ship_type_id',
+        'corporationID' => 'corporation_id',
+        'perception' => 'perception',
+        'willpower' => 'willpower',
+        'charisma' => 'charisma',
+        'memory' => 'memory',
+        'intelligence' => 'intelligence',
+        'iconID' => 'icon_id',
+        'shortDescription' => 'short_description',
+        'shortMaleDescription' => 'short_male_description',
+        'shortFemaleDescription' => 'short_female_description',
+    },
 ];
 
 my $opt_dsn;
