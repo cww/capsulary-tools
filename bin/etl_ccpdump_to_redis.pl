@@ -71,10 +71,11 @@ my $opt_password;
 my $opt_help;
 my $opt_redis_host = 'localhost';
 my $opt_redis_port = 6379;
-my $opt_debug_output;
 my @opt_tables;
 my %_opt_tables;
+my $opt_debug_output;
 my $opt_dry_run;
+my $opt_small;
 
 sub usage
 {
@@ -87,13 +88,15 @@ sub usage
     say "    -u USERNAME    The username to use for SQL Server";
     say "    -p PASSWORD    The password to use for SQL Server";
     say "Optional:";
-    say "    --debug            Enable debug (trace, actually) output";
     say "    -h                 Print this helpful usage information";
     say "    --redis-host HOST  The Redis hostname [localhost]";
     say "    --redis-port PORT  The Redis port [6379]";
     say "    --tables T1,T2,... A list of tables to export (do not include";
     say "                       \"dbo\" schema prefix) [all tables]";
-    say "    --dry-run          Do not connect to anything";
+    say "Debug:";
+    say "    --debug        Enable debug (trace, actually) output";
+    say "    --dry-run      Do not connect to anything";
+    say "    --small        Only process one row from each table";
 
     exit -1;
 }
@@ -111,6 +114,7 @@ sub parse_opts
         'redis-port=s' => \$opt_redis_port,
         'tables=s'     => \@opt_tables,
         'dry-run'      => \$opt_dry_run,
+        'small'        => \$opt_small,
     );
 
     usage() if $opt_help;
@@ -185,7 +189,9 @@ for my $table_ref (@{+ETL})
 
     my @columns = grep { !/^__/ } keys %$table_ref;
     my $column_clause = join(q{, }, @columns);
-    my $sql = qq{SELECT * FROM $table_name};
+    my $sql = $opt_small ?
+              qq{SELECT TOP 1 * FROM $table_name} :
+              qq{SELECT * FROM $table_name};
     DEBUG "Generated SQL: $sql";
     if ($opt_dry_run)
     {
