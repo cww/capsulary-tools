@@ -18,7 +18,7 @@ BEGIN
     $ENV{TDSVER} = '7.0';
 }
 
-use constant BASE => 'eve';
+use constant REDIS_BASE => 'eve';
 use constant SCHEMA => 'dbo';
 use constant ETL =>
 [
@@ -236,7 +236,48 @@ for my $table_ref (@{+ETL})
     my $i_row = 0;
     while (my $row_ref = $sth->fetchrow_hashref())
     {
-        #say %$row_ref;
+        # Handle each key/value pair in this row.
+        while (my ($key, $value) = each %$row_ref)
+        {
+            if (!defined $value)
+            {
+                TRACE "Skipping null value for key [$key].";
+                next;
+            }
+            
+            # The key looks like "eve.type.123456.name".
+            my $redis_key = join
+            (
+                q{.},
+                REDIS_BASE,
+                $table_ref->{__reference_name},
+                $row_ref->{$primary_key_name},
+                $table_ref->{$key},
+            );
+            TRACE "Setting key [$redis_key]->[$value].";
+            $rh->set($redis_key, $value);
+        }
+
+        # Handle backrefs.
+        my $backrefs_ref = ref $table_ref->{__backref} eq 'HASH' ?
+                           [ $table_ref->{__backref} ] :
+                           $table_ref->{__backref};
+        for my $backref_ref (@$backrefs_ref)
+        {
+            # The key looks like "eve.type.by_name.Foo Bar Baz".
+            my $redis_key = join
+            (
+                q{.},
+                REDIS_BASE,
+                $table_ref->{__reference_name},
+                'by_' . $backref_ref->{by},
+                $row_ref->{$backref_ref->{referrer}},
+            );
+            my $value = $row_ref->{$primary_key_name};
+            TRACE "Adding backref [$redis_key]->[$value].";
+            $rh->sadd($redis_key, $value);
+        }
+
         ++$i_row;
     }
 
