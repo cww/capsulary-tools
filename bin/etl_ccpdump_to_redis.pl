@@ -48,6 +48,21 @@ use constant ETL =>
         'chanceOfDuplicating' => 'chance_of_duplicating',
         'iconID' => 'icon_id',
     },
+    {
+        '__reference_name' => 'race',
+        '__table' => 'chrRaces',
+        '__primary_key' => 'raceID',
+        '__backref' =>
+        {
+            by       => 'name',
+            referrer => 'raceName',
+        },
+        'raceID' => 'id',
+        'raceName' => 'name',
+        'description' => 'description',
+        'iconID' => 'icon_id',
+        'shortDescription' => 'short_description',
+    },
 ];
 
 my $opt_dsn;
