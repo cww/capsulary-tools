@@ -17,3 +17,9 @@ up.  My favorite way to import it is the following.
     # echo 'create database evedump;' | mysql
     # bzip2 -cd evedump.sql.bz2 | mysql evedump
 
+Prerequisites
+=============
+
+For the Perl scripts, you'll probably want Redis.pm 1.951 or better.  Debian
+squeeze ships with version 1.2 or so, and that will break badly (and probably
+mess up your Redis database while it's at it).
