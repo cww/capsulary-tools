@@ -292,5 +292,8 @@ for my $table_ref (@{+ETL})
     $sth->finish();
 }
 
-$sqlserver->disconnect();
-$redis->disconnect();
+if (!$opt_dry_run)
+{
+    $sqlserver->disconnect();
+    $redis->disconnect();
+}
