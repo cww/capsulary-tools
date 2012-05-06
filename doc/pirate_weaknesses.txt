@@ -1,9 +1,0 @@
-Hardeners to use against:
-
-Angel - All
-Gurista - Kinetic/Thermal
-Blood - EM/Thermal
-Sansha - EM/Thermal
-Serpentis - Kinetic/Thermal
-
-Mercenary - EM/Thermal
