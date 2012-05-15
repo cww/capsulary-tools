@@ -2,47 +2,6 @@
     "etl":
     [
         {
-            "__table":"invTypes",
-            "__primary_key":"typeID",
-            "__reference_name":"type",
-            "__backref":
-            {
-                "referrer":"typeName",
-                "by":"name"
-            },
-            "chanceOfDuplicating":"chance_of_duplicating",
-            "raceID":"race_id",
-            "portionSize":"portion_size",
-            "typeID":"id",
-            "mass":"mass",
-            "iconID":"icon_id",
-            "groupID":"group_id",
-            "volume":"volume",
-            "basePrice":"base_price",
-            "typeName":"name",
-            "radius":"radius",
-            "description":"description",
-            "capacity":"capacity",
-            "marketGroupID":"market_group_id",
-            "published":"published",
-            "graphicID":"graphic_id"
-        },
-        {
-            "__table":"chrRaces",
-            "__primary_key":"raceID",
-            "__reference_name":"race",
-            "__backref":
-            {
-                "referrer":"raceName",
-                "by":"name"
-            },
-            "iconID":"icon_id",
-            "raceName":"name",
-            "description":"description",
-            "raceID":"id",
-            "shortDescription":"short_description"
-        },
-        {
             "__table":"chrBloodlines",
             "__primary_key":"bloodlineID",
             "__reference_name":"bloodline",
@@ -74,6 +33,47 @@
             "femaleDescription":"female_description",
             "shortDescription":"short_description",
             "maleDescription":"male_description"
+        },
+        {
+            "__table":"chrRaces",
+            "__primary_key":"raceID",
+            "__reference_name":"race",
+            "__backref":
+            {
+                "referrer":"raceName",
+                "by":"name"
+            },
+            "iconID":"icon_id",
+            "raceName":"name",
+            "description":"description",
+            "raceID":"id",
+            "shortDescription":"short_description"
+        },
+        {
+            "__table":"invTypes",
+            "__primary_key":"typeID",
+            "__reference_name":"type",
+            "__backref":
+            {
+                "referrer":"typeName",
+                "by":"name"
+            },
+            "chanceOfDuplicating":"chance_of_duplicating",
+            "raceID":"race_id",
+            "portionSize":"portion_size",
+            "typeID":"id",
+            "mass":"mass",
+            "iconID":"icon_id",
+            "groupID":"group_id",
+            "volume":"volume",
+            "basePrice":"base_price",
+            "typeName":"name",
+            "radius":"radius",
+            "description":"description",
+            "capacity":"capacity",
+            "marketGroupID":"market_group_id",
+            "published":"published",
+            "graphicID":"graphic_id"
         }
     ]
 }
