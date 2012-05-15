@@ -50,6 +50,8 @@ my $opt_redis_host = 'localhost';
 my $opt_redis_port = 6379;
 my @opt_tables;
 my %_opt_tables;
+my @opt_drop;
+my $opt_drop_all;
 my $opt_debug_output;
 my $opt_dry_run;
 my $opt_small;
@@ -70,6 +72,11 @@ sub usage
     say "    --redis-port PORT  The Redis port [6379]";
     say "    --tables T1,T2,... A list of tables to export (do not include";
     say "                       \"dbo\" schema prefix) [all tables]";
+    say "Destructive:";
+    say "    --drop T1,T2,...   A list of tables whose data to delete from";
+    say "                       the Redis database before performing any";
+    say "                       other operations";
+    say "    --drop-all         Same as above but with all tables";
     say "Debug:";
     say "    --debug        Enable debug (trace, actually) output";
     say "    --dry-run      Do not connect to anything";
@@ -108,6 +115,8 @@ sub parse_opts
         'redis-host=s' => \$opt_redis_host,
         'redis-port=s' => \$opt_redis_port,
         'tables=s'     => \@opt_tables,
+        'drop=s'       => \@opt_drop,
+        'drop-all'     => \$opt_drop_all,
         'dry-run'      => \$opt_dry_run,
         'small'        => \$opt_small,
     );
@@ -116,6 +125,8 @@ sub parse_opts
     usage('Must specify a DSN') unless $opt_dsn;
     usage('Must specify a username') unless $opt_username;
     usage('Must specify a password') unless $opt_password;
+    usage('Cannot specify --drop and --drop-all together') if
+        $opt_drop_all && scalar(@opt_drop) > 0;
 
     Log::Log4perl->easy_init($TRACE) if $opt_debug_output;
 
@@ -137,12 +148,23 @@ sub parse_opts
             $valid_table_names{$table_name};
     }
 
+    if (@opt_drop > 0)
+    {
+        @opt_drop = split(/,/, join(q{,}, @opt_drop));
+    }
+
+    if ($opt_drop_all)
+    {
+        @opt_drop = keys %valid_table_names;
+    }
+
     DEBUG "Opt: DSN = $opt_dsn";
     DEBUG "Opt: Username = $opt_username";
     DEBUG "Opt: Password = $opt_password";
     DEBUG "Opt: Redis Host = $opt_redis_host";
     DEBUG "Opt: Redis Port = $opt_redis_port";
     DEBUG 'Opt: Tables = ' . join(q{, }, @opt_tables);
+    DEBUG 'Opt: Drop Tables = ' . join(q{, }, @opt_drop);
 }
 
 parse_etl_json();
@@ -171,6 +193,27 @@ if (!$opt_dry_run)
 {
     $redis->connect();
     $rh = $redis->get_handle();
+
+    for my $table (@opt_drop)
+    {
+        my @table_defs = grep { $_->{__table} eq $table } @$etl;
+        die "Invalid configuration: table $table specified more than once" if
+            scalar(@table_defs) > 1;
+        my $selector = join
+        (
+            q{.},
+            REDIS_BASE,
+            $table_defs[0]->{__reference_name},
+            q{*},
+        );
+        DEBUG "Searching for keys to delete with selector [$selector]";
+        my @keys = $rh->keys($selector);
+        for my $key (@keys)
+        {
+            DEBUG "Deleting key [$key]";
+            $rh->del($key);
+        }
+    }
 }
 
 for my $table_ref (@$etl)
