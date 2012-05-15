@@ -21,8 +21,9 @@
 
 use common::sense;
 
-use FindBin qw($Script);
+use FindBin qw($Bin $Script);
 use Getopt::Long;
+use JSON::PP;
 use Log::Log4perl qw(:easy);
 
 use Capsulary::DB::Redis;
@@ -39,84 +40,8 @@ BEGIN
 
 use constant REDIS_BASE => 'eve';
 use constant SCHEMA => 'dbo';
-use constant ETL =>
-[
-    {
-        '__reference_name' => 'type',
-        '__table' => 'invTypes',
-        '__primary_key' => 'typeID',
-        '__backref' =>
-        {
-            by       => 'name',
-            referrer => 'typeName',
-        },
-        'typeID' => 'id',
-        'groupID' => 'group_id',
-        'typeName' => 'name',
-        'description' => 'description',
-        'graphicID' => 'graphic_id',
-        'radius' => 'radius',
-        'mass' => 'mass',
-        'volume' => 'volume',
-        'capacity' => 'capacity',
-        'portionSize' => 'portion_size',
-        'raceID' => 'race_id',
-        'basePrice' => 'base_price',
-        'published' => 'published',
-        'marketGroupID' => 'market_group_id',
-        'chanceOfDuplicating' => 'chance_of_duplicating',
-        'iconID' => 'icon_id',
-    },
-    {
-        '__reference_name' => 'race',
-        '__table' => 'chrRaces',
-        '__primary_key' => 'raceID',
-        '__backref' =>
-        {
-            by       => 'name',
-            referrer => 'raceName',
-        },
-        'raceID' => 'id',
-        'raceName' => 'name',
-        'description' => 'description',
-        'iconID' => 'icon_id',
-        'shortDescription' => 'short_description',
-    },
-    {
-        '__reference_name' => 'bloodline',
-        '__table' => 'chrBloodlines',
-        '__primary_key' => 'bloodlineID',
-        '__backref' =>
-        [
-            {
-                by       => 'name',
-                referrer => 'bloodlineName',
-            },
-            {
-                by       => 'race_id',
-                referrer => 'raceID',
-            },
-        ],
-        'bloodlineID' => 'id',
-        'bloodlineName' => 'name',
-        'raceID' => 'race_id',
-        'description' => 'description',
-        'maleDescription' => 'male_description',
-        'femaleDescription' => 'female_description',
-        'shipTypeID' => 'ship_type_id',
-        'corporationID' => 'corporation_id',
-        'perception' => 'perception',
-        'willpower' => 'willpower',
-        'charisma' => 'charisma',
-        'memory' => 'memory',
-        'intelligence' => 'intelligence',
-        'iconID' => 'icon_id',
-        'shortDescription' => 'short_description',
-        'shortMaleDescription' => 'short_male_description',
-        'shortFemaleDescription' => 'short_female_description',
-    },
-];
 
+my $etl;
 my $opt_dsn;
 my $opt_username;
 my $opt_password;
@@ -153,6 +78,24 @@ sub usage
     exit -1;
 }
 
+sub parse_etl_json
+{
+    my $json = JSON::PP->new();
+    my $json_file = "$Bin/etl.json";
+    eval
+    {
+        my $fh;
+        open($fh, '<', $json_file) or die $!;
+        while (my $line = <$fh>)
+        {
+            $json->incr_parse($line);
+        }
+        close($fh);
+        $etl = $json->incr_parse()->{etl};
+    };
+    die "unable to parse file [$json_file]: $@" if $@;
+}
+
 sub parse_opts
 {
     my $result = GetOptions
@@ -186,7 +129,7 @@ sub parse_opts
         %_opt_tables = map { $_ => 1 } @opt_tables;
     }
 
-    my %valid_table_names = map { $_->{__table} => 1 } @{+ETL};
+    my %valid_table_names = map { $_->{__table} => 1 } @$etl;
     for my $table_name (@opt_tables)
     {
         TRACE "Checking table name [$table_name] for validity.";
@@ -202,6 +145,7 @@ sub parse_opts
     DEBUG 'Opt: Tables = ' . join(q{, }, @opt_tables);
 }
 
+parse_etl_json();
 parse_opts();
 
 my $sqlserver = Capsulary::DB::SqlServer->new
@@ -229,7 +173,7 @@ if (!$opt_dry_run)
     $rh = $redis->get_handle();
 }
 
-for my $table_ref (@{+ETL})
+for my $table_ref (@$etl)
 {
     # If the user specified a list of tables on the command-line, then only
     # process the tables that were specified.
