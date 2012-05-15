@@ -74,6 +74,42 @@
             "marketGroupID":"market_group_id",
             "published":"published",
             "graphicID":"graphic_id"
+        },
+        {
+            "__table":"mapSolarSystems",
+            "__primary_key":"solarSystemID",
+            "__reference_name":"solar_system",
+            "__backref":
+            {
+                "referrer":"solarSystemName",
+                "by":"name"
+            },
+            "regionID":"region_id",
+            "constellationID":"constellation_id",
+            "solarSystemID":"id",
+            "solarSystemName":"name",
+            "x":"x",
+            "y":"y",
+            "z":"z",
+            "xMin":"x_min",
+            "xMax":"x_max",
+            "yMin":"y_min",
+            "yMax":"y_max",
+            "zMin":"z_min",
+            "zMax":"z_max",
+            "luminosity":"luminosity",
+            "border":"border",
+            "fringe":"fringe",
+            "corridor":"corridor",
+            "hub":"hub",
+            "international":"international",
+            "regional":"regional",
+            "constellation":"constellation",
+            "security":"security",
+            "factionID":"faction_id",
+            "radius":"radius",
+            "sunTypeID":"sun_type_id",
+            "securityClass":"security_class"
         }
     ]
 }
