@@ -200,6 +200,8 @@ for my $table (@opt_drop)
     my @table_defs = grep { $_->{__table} eq $table } @$etl;
     die "Invalid configuration: table $table specified more than once" if
         scalar(@table_defs) > 1;
+
+    # Create a selector that looks like "eve.solar_system.*".
     my $selector = join
     (
         q{.},
