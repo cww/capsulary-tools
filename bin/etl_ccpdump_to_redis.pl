@@ -193,26 +193,34 @@ if (!$opt_dry_run)
 {
     $redis->connect();
     $rh = $redis->get_handle();
+}
 
-    for my $table (@opt_drop)
+for my $table (@opt_drop)
+{
+    my @table_defs = grep { $_->{__table} eq $table } @$etl;
+    die "Invalid configuration: table $table specified more than once" if
+        scalar(@table_defs) > 1;
+    my $selector = join
+    (
+        q{.},
+        REDIS_BASE,
+        $table_defs[0]->{__reference_name},
+        q{*},
+    );
+
+    DEBUG "Searching for keys to delete with selector [$selector]";
+
+    if ($opt_dry_run)
     {
-        my @table_defs = grep { $_->{__table} eq $table } @$etl;
-        die "Invalid configuration: table $table specified more than once" if
-            scalar(@table_defs) > 1;
-        my $selector = join
-        (
-            q{.},
-            REDIS_BASE,
-            $table_defs[0]->{__reference_name},
-            q{*},
-        );
-        DEBUG "Searching for keys to delete with selector [$selector]";
-        my @keys = $rh->keys($selector);
-        for my $key (@keys)
-        {
-            DEBUG "Deleting key [$key]";
-            $rh->del($key);
-        }
+        DEBUG 'Dry run: not searching for or deleting keys.';
+        next;
+    }
+
+    my @keys = $rh->keys($selector);
+    for my $key (@keys)
+    {
+        DEBUG "Deleting key [$key]";
+        $rh->del($key);
     }
 }
 
