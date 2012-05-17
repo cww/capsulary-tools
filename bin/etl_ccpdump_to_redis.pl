@@ -21,6 +21,7 @@
 
 use common::sense;
 
+use Digest::MD5;
 use FindBin qw($Bin $Script);
 use Getopt::Long;
 use JSON::PP;
@@ -252,6 +253,21 @@ for my $table_ref (@$etl)
     my $i_row = 0;
     while (my $row_ref = $sth->fetchrow_hashref())
     {
+        # If this table doesn't have a primary key, generate one based on the
+        # hash of the values in the row.
+        my $primary_key;
+        if ($primary_key_name)
+        {
+            $primary_key = $row_ref->{$primary_key_name};
+        }
+        else
+        {
+            my @sorted_keys = sort { $a cmp $b } keys %$row_ref;
+            my @values = map { $row_ref->{$_} } @sorted_keys;
+            $primary_key = Digest::MD5::md5_hex(join(q{##}, @values));
+            TRACE "Generated primary key [$primary_key].";
+        }
+
         # Handle each key/value pair in this row.
         while (my ($key, $value) = each %$row_ref)
         {
@@ -260,14 +276,14 @@ for my $table_ref (@$etl)
                 TRACE "Skipping null value for key [$key].";
                 next;
             }
-            
+
             # The key looks like "eve.type.123456.name".
             my $redis_key = join
             (
                 q{.},
                 REDIS_BASE,
                 $table_ref->{__reference_name},
-                $row_ref->{$primary_key_name},
+                $primary_key,
                 $table_ref->{$key},
             );
             TRACE "Setting key [$redis_key]->[$value].";
@@ -289,9 +305,8 @@ for my $table_ref (@$etl)
                 'by_' . $backref_ref->{by},
                 $row_ref->{$backref_ref->{referrer}},
             );
-            my $value = $row_ref->{$primary_key_name};
-            TRACE "Adding backref [$redis_key]->[$value].";
-            $rh->sadd($redis_key, $value);
+            TRACE "Adding backref [$redis_key]->[$primary_key].";
+            $rh->sadd($redis_key, $primary_key);
         }
 
         ++$i_row;

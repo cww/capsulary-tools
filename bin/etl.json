@@ -76,6 +76,27 @@
             "graphicID":"graphic_id"
         },
         {
+            "__table":"mapSolarSystemJumps",
+            "__reference_name":"solar_system_jump",
+            "__backref":
+            [
+                {
+                    "referrer":"fromSolarSystemID",
+                    "by":"from_solar_system_id"
+                },
+                {
+                    "referrer":"toSolarSystemID",
+                    "by":"to_solar_system_id"
+                }
+            ],
+            "fromConstellationID":"from_constellation_id",
+            "fromRegionID":"from_region_id",
+            "fromSolarSystemID":"from_solar_system_id",
+            "toConstellationID":"to_constellation_id",
+            "toRegionID":"to_region_id",
+            "toSolarSystemID":"to_solar_system_id"
+        },
+        {
             "__table":"mapSolarSystems",
             "__primary_key":"solarSystemID",
             "__reference_name":"solar_system",
