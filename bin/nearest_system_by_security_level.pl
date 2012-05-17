@@ -21,11 +21,17 @@
 
 use common::sense;
 
+use Log::Log4perl qw(:easy);
 use Redis;
 
 use Capsulary::DB::Redis;
 
 my $redis;
+
+BEGIN
+{
+    Log::Log4perl->easy_init($INFO);
+}
 
 sub usage
 {
@@ -37,7 +43,7 @@ sub usage
 
 sub fatal
 {
-    say "FATAL: ", @_;
+    FATAL join(q{ }, @_);
     exit 1;
 }
 
