@@ -1,11 +1,37 @@
-Meta
-====
+Intent
+======
 
-The code in this repository is licensed under the MIT License, the full text
-of which is included in the next section of this document.
+The following licensing terms are intended to protect my intellectual property
+in such a way that my name will appear alongside any property I have created
+but that the property is still free to use and modify by anyone who desires to
+do so.  I will endeavor to put any property that is not explicitly mine or
+that of a contributor to this project in the /vendor/ directory in this
+repository, and I claim no copyright to or ownership of any property in that
+directory (unless I include something that I created separately, of course).
 
-License
-=======
+Copyright Notice
+================
+
+Everything in this repository, with the exception of files that exist under
+the /vendor/ directory, is Copyright (c) 2012 Colin Wetherbee.
+
+Image License
+=============
+
+Images in this repository, outside of the /vendor/ directory, are licensed
+under a Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported
+License.  A human-readable version of this license and a link to the full
+text may be found at the following URL.
+
+http://creativecommons.org/licenses/by-nc-sa/3.0/
+
+Code License
+============
+
+The code in this repository, with the exception of files that exist under the
+/vendor/ directory, unless specifically noted in those files, is licensed
+under the MIT license.  The full text of the MIT license follows this
+paragraph.
 
 Copyright (c) 2012 Colin Wetherbee
 
