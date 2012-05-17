@@ -23,6 +23,10 @@ use common::sense;
 
 use Redis;
 
+use Capsulary::DB::Redis;
+
+my $redis;
+
 sub usage
 {
     my ($bin) = @_;
@@ -37,12 +41,12 @@ sub fatal
     exit 1;
 }
 
-my $redis = Redis->new(encoding => undef) or die $!;
 sub get_sec
 {
     my ($system_id) = @_;
 
-    my $real_sec = $redis->get("eve.system.$system_id.sec");
+    my $real_sec =
+        $redis->get_handle()->get("eve.solar_system.$system_id.security");
 
     # Turn security status into an integer; e.g. 0.41234 -> 4. 
     return int($real_sec * 10 + 0.5);
@@ -52,20 +56,22 @@ sub get_system_name
 {
     my ($system_id) = @_;
 
-    return $redis->get("eve.system.$system_id.name");
+    return $redis->get_handle()->get("eve.solar_system.$system_id.name");
 }
 
 sub get_gates
 {
     my ($system_id) = @_;
 
-    my $num_gates = $redis->llen("eve.system.$system_id.gates");
+    my $rh = $redis->get_handle();
 
-    my @gates;
-    for (my $i = 0; $i < $num_gates; ++$i)
+    my @gate_map_ids =
+    $rh->smembers("eve.solar_system_jump.by_from_solar_system_id.$system_id");
+
+    my @gates = map
     {
-        push(@gates, $redis->lindex("eve.system.$system_id.gates", $i));
-    }
+        $rh->get("eve.solar_system_jump.$_.to_solar_system_id");
+    } @gate_map_ids;
 
     return \@gates;
 }
@@ -137,9 +143,17 @@ usage($0) unless defined($ARGV[0]) && defined($ARGV[1]);
 my $current_system = $ARGV[0];
 my $desired_sec = $ARGV[1];
 
-my $redis = Redis->new(encoding => undef);
+$redis = Capsulary::DB::Redis->new
+({
+    host => 'localhost',
+    port => 6379,
+});
+$redis->connect();
 
-my $current_system_id = $redis->get("eve.system.by_name.$current_system.id");
+my $rh = $redis->get_handle();
+
+my @system_backrefs = $rh->smembers("eve.solar_system.by_name.$current_system");
+my $current_system_id = $system_backrefs[0];
 if (!$current_system_id)
 {
     fatal("Unknown system: $current_system");
