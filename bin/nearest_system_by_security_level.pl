@@ -149,11 +149,7 @@ usage($0) unless defined($ARGV[0]) && defined($ARGV[1]);
 my $current_system = $ARGV[0];
 my $desired_sec = $ARGV[1];
 
-$redis = Capsulary::DB::Redis->new
-({
-    host => 'localhost',
-    port => 6379,
-});
+$redis = Capsulary::DB::Redis->new();
 $redis->connect();
 
 my $rh = $redis->get_handle();
