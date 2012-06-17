@@ -90,9 +90,8 @@ sub scan
     my @results;
 
     my $depth = 1;
-    my $finished = 0;
     my %systems_seen = ( $current_system_id => 1 );
-    while (!$finished)
+    while (scalar(@results) == 0)
     {
         for (my $i = 0; $i < scalar(@candidates); ++$i)
         {
@@ -109,7 +108,6 @@ sub scan
                 if ($depth > 1 && $sec == $desired_sec)
                 {
                     push(@results, $candidate_ref);
-                    $finished = 1;
                 }
                 else
                 {
