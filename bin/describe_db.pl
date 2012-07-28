@@ -23,7 +23,7 @@ use common::sense;
 
 use Capsulary::DB::Redis;
 
-my $db = Capsulary::DB::Redis->new({ host => 'localhost', port => 9160 });
+my $db = Capsulary::DB::Redis->new({ host => 'localhost', port => 6379 });
 my $redis = $db->connect();
 
 my @keys = $redis->keys('*');
