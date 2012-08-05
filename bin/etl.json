@@ -2,6 +2,27 @@
     "etl":
     [
         {
+            "__table":"chrAncestries",
+            "__primary_key":"ancestryID",
+            "__reference_name":"ancestry",
+            "__backref":
+            {
+                "referrer":"ancestryName",
+                "by":"name"
+            },
+            "ancestryID":"id",
+            "ancestryName":"name",
+            "bloodlineID":"bloodline_id",
+            "description":"description",
+            "perception":"perception",
+            "willpower":"willpower",
+            "charisma":"charisma",
+            "memory":"memory",
+            "intelligence":"intelligence",
+            "iconID":"icon_id",
+            "shortDescription":"short_description"
+        },
+        {
             "__table":"chrBloodlines",
             "__primary_key":"bloodlineID",
             "__reference_name":"bloodline",
