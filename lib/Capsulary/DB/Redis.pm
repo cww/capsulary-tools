@@ -24,17 +24,27 @@ use common::sense;
 use Carp;
 use Redis;
 
+use constant DEFAULT_REDIS_HOST => 'localhost';
+use constant DEFAULT_REDIS_PORT => 6379;
+
+sub get_default_redis_host
+{
+    return DEFAULT_REDIS_HOST;
+}
+
+sub get_default_redis_port
+{
+    return DEFAULT_REDIS_PORT;
+}
+
 sub new
 {
     my ($class, $args_ref) = @_;
 
-    croak 'Must specify host' unless $args_ref->{host};
-    croak 'Must specify port' unless $args_ref->{port};
-
     my %self =
     (
-        host => $args_ref->{host},
-        port => $args_ref->{port},
+        host => $args_ref->{host} // DEFAULT_REDIS_HOST,
+        port => $args_ref->{port} // DEFAULT_REDIS_PORT,
     );
 
     return bless(\%self, $class);
