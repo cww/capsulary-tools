@@ -1,0 +1,11 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Capsulary/Tools.pm
+lib/Capsulary/DB/Redis.pm
+lib/Capsulary/DB/SqlServer.pm
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
