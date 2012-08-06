@@ -130,6 +130,24 @@
             "shortDescription":"short_description"
         },
         {
+            "__table":"invBlueprintTypes",
+            "__primary_key":"blueprintTypeID",
+            "__reference_name":"blueprint_type",
+            "blueprintTypeID":"id",
+            "parentBlueprintTypeID":"parent_blueprint_type_id",
+            "productTypeID":"product_type_id",
+            "productionTime":"production_time",
+            "techLevel":"tech_level",
+            "researchProductivityTime":"research_productivity_time",
+            "researchMaterialTime":"research_material_time",
+            "researchCopyTime":"research_copy_time",
+            "researchTechTime":"research_tech_time",
+            "productivityModifier":"productivity_modifier",
+            "materialModifier":"material_modifier",
+            "wasteFactor":"waste_factor",
+            "maxProductionLimit":"max_production_limit"
+        },
+        {
             "__table":"invTypes",
             "__primary_key":"typeID",
             "__reference_name":"type",
