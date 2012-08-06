@@ -2,6 +2,38 @@
     "etl":
     [
         {
+            "__table":"agtAgentTypes",
+            "__primary_key":"agentTypeID",
+            "__reference_name":"agent_type",
+            "__backref":
+            {
+                "referrer":"agentType",
+                "by":"type"
+            },
+            "agentTypeID":"id",
+            "agentType":"agent_type"
+        },
+        {
+            "__table":"agtAgents",
+            "__primary_key":"agentID",
+            "__reference_name":"agent",
+            "agentID":"id",
+            "divisionID":"division_id",
+            "corporationID":"corporation_id",
+            "locationID":"location_id",
+            "level":"level",
+            "quality":"quality",
+            "agentTypeID":"agent_type_id",
+            "isLocator":"is_locator"
+        },
+        {
+            "__table":"agtResearchAgents",
+            "__primary_key":"agentID",
+            "__reference_name":"research_agent_map",
+            "agentID":"id",
+            "typeID":"type_id"
+        },
+        {
             "__table":"chrAncestries",
             "__primary_key":"ancestryID",
             "__reference_name":"ancestry",
@@ -21,6 +53,17 @@
             "intelligence":"intelligence",
             "iconID":"icon_id",
             "shortDescription":"short_description"
+        },
+        {
+            "__table":"chrAttributes",
+            "__primary_key":"attributeID",
+            "__reference_name":"attribute",
+            "attributeID":"id",
+            "attributeName":"attribute_name",
+            "description":"description",
+            "iconID":"icon_id",
+            "shortDescription":"short_description",
+            "notes":"notes"
         },
         {
             "__table":"chrBloodlines",
@@ -54,6 +97,22 @@
             "femaleDescription":"female_description",
             "shortDescription":"short_description",
             "maleDescription":"male_description"
+        },
+        {
+            "__table":"chrFactions",
+            "__primary_key":"factionID",
+            "__reference_name":"faction",
+            "factionID":"id",
+            "factionName":"name",
+            "description":"description",
+            "raceIDs":"race_id",
+            "solarSystemID":"solar_system_id",
+            "corporationID":"corporation_id",
+            "sizeFactor":"size_factor",
+            "stationCount":"station_count",
+            "stationSystemCount":"station_system_count",
+            "militiaCorporationID":"militia_corporation_id",
+            "iconID":"icon_id"
         },
         {
             "__table":"chrRaces",
